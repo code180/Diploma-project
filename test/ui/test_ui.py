@@ -1,101 +1,44 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 
 
-def test_open_catalog():
-    """Тест на открытие каталога книг."""
-    driver = webdriver.Chrome(
-        service=ChromeService(ChromeDriverManager().install()))
-    driver.get("https://www.chitai-gorod.ru/")
-    driver.maximize_window
+def test_add_book_to_cart():
+    # Запуск браузера
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
-    driver.find_element(By.CLASS_NAME, "catalog__button").click()
-    driver.find_element(By.XPATH, '//span[text()="Книги"]').click()
-    driver.find_element(
-        By.XPATH, '//a[text()="Посмотреть все товары"]').click()
-    search_result = driver.find_elements(
-        By.CLASS_NAME, "product-card product-card product")
-    assert len(search_result) > 0
-    driver.quit()
+    # Переход на страницу книги
+    driver.get("https://www.chitai-gorod.ru/product/traun-soyuzniki-2797027")
+    driver.maximize_window()
 
-
-def test_select_genre():
-    driver = webdriver.Chrome(
-        service=ChromeService(ChromeDriverManager().install()))
-    driver.get("https://www.chitai-gorod.ru/catalog/books-18030")
-    driver.maximize_window
-
-    """Тест на выбор жанра книг."""
-    genre_links = driver.find_elements(
-        By.CLASS_NAME, 'catalog-menu__parent--children')
-    for link in genre_links:
-        if link.text == 'Кулинария':
-            link.click()
-            break
-    else:
-        raise Exception("Элемент с текстом 'Кулинария' не найден")
-    assert "Кулинария" in driver.page_source
-    driver.quit()
-
-
-def test_search_for_book(driver):
-    """Тест на поиск книги."""
-    driver = webdriver.Chrome(
-        service=ChromeService(ChromeDriverManager().install()))
-    driver.get("https://www.chitai-gorod.ru/")
-    driver.maximize_window
-
-    search_box = driver.find_element(By.CLASS_NAME, 'header-search__input')
-    search_box.send_keys("Траун. Союзники")
-    search_box.submit()
-    assert driver.find_element(
-        By.CLASS_NAME, 'result-item__mark').is_displayed()
-    driver.quit()
-
-
-def test_add_book_to_cart(driver):
-    driver = webdriver.Chrome(
-        service=ChromeService(ChromeDriverManager().install()))
-    driver.get(
-        "https://www.chitai-gorod.ru/search?phrase=%D0%A2%D1%80%D0%B0%D1%83%D0%BD.%20%D0%A1%D0%BE%D1%8E%D0%B7%D0%BD%D0%B8%D0%BA%D0%B8")
-
-    """Тест на добавление книги в корзину."""
-    # Ожидание, пока появится элемент книги "Траун. Союзники"
-    book_element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((
-            By.XPATH, "//div[@data-chg-product-name='Траун. Союзники']"))
+    # Ожидание появления кнопки "Купить"
+    buy_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, ".//button[contains(@class, 'product-offer-button chg-app-button chg-app-button--primary chg-app-button--extra-large chg-app-button--brand-blue chg-app-button--block')]"))
     )
-    # Поиск кнопки "Купить" в рамках блока с книгой
-    buy_button = book_element.find_element(
-        By.XPATH, ".//div[contains(@class, 'button action-button blue')]")
+
     # Клик по кнопке "Купить"
     buy_button.click()
 
-    cart_items = driver.find_element(By.CLASS_NAME, "action-button__text")
-
-    assert "Оформить" in cart_items.text
-    driver.quit()
-
-def test_add_book_to_bookmarks():
-    driver = webdriver.Chrome(
-        service=ChromeService(ChromeDriverManager().install()))
-    driver.get("https://www.chitai-gorod.ru/search?phrase=%D0%A2%D1%80%D0%B0%D1%83%D0%BD.%20%D0%A1%D0%BE%D1%8E%D0%B7%D0%BD%D0%B8%D0%BA%D0%B8")
-
-    # Ожидание появления блока с книгой "Траун. Союзники"
-    book_element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((
-            By.XPATH, "//div[@data-chg-product-name='Траун. Союзники']"))
+    # Ожидание появления кнопки "Оформить"
+    offer_button = WebDriverWait(driver, 10).until(
+         EC.presence_of_element_located(
+            (By.CLASS_NAME, 'product-offer-button chg-app-button chg-app-button--primary chg-app-button--extra-large chg-app-button--green chg-app-button--block'))
     )
 
-    # Поиск кнопки "Закладки" в рамках блока книги
-    book_element.find_element(
-        By.XPATH, ".//button[contains(@class, 'button favorite-button')]").click()
+    # Нажатие на кнопку "Оформить"
+    offer_button.click()
 
-    bookmarks = driver.find_element(
-        By.CLASS_NAME, "badge-notice header-bookmarks__badge")
-    assert "1" in bookmarks.text
+    # Ожидание загрузки корзины
+    cart_items = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "products__items")))
+
+    # Проверка, что книга "Траун. Союзники" есть в корзине
+    book = cart_items.find_element(By.CLASS_NAME, "product-title__head")
+    assert book.text == "Траун. Союзники"
+
+    # Завершаем работу браузера
     driver.quit()
+

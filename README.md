@@ -38,3 +38,6 @@ UI тесты: pytest -m ui
 API тесты: pytest -m api
 Все тесты: pytest
 
+## Ссылка на сам проект в GitHub
+https://github.com/code180/Diploma-project
+

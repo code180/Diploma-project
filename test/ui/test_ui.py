@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from main_page_ui import MainPage, ProductPage
 
 
+@pytest.mark.ui
 @allure.feature("Каталог")
 def test_open_catalog():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
@@ -22,6 +23,7 @@ def test_open_catalog():
         driver.quit()
 
 
+@pytest.mark.ui
 @allure.feature("Поиск")
 def test_search_for_book():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
@@ -40,6 +42,7 @@ def test_search_for_book():
         driver.quit()
 
 
+@pytest.mark.ui
 @allure.feature("Жанры")
 def test_select_genre():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
@@ -58,6 +61,7 @@ def test_select_genre():
         driver.quit()
 
 
+@pytest.mark.ui
 @allure.feature("Корзина")
 def test_add_book_to_cart():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
@@ -75,6 +79,7 @@ def test_add_book_to_cart():
         driver.quit()
 
 
+@pytest.mark.ui
 @allure.feature("Корзина")
 def test_add_and_remove_book_from_cart():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))

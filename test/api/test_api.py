@@ -3,6 +3,7 @@ import allure
 from main_page_api import BooksAPI, CartAPI
 
 
+@pytest.mark.api
 def test_get_books():
     with allure.step("Тест на получение и проверку списка книг"):
         response = BooksAPI.get_books()
@@ -17,6 +18,7 @@ def test_get_books():
                 assert attributes, "Expected non-empty attributes list"
 
 
+@pytest.mark.api
 @allure.step("Тест на добавление товара в корзину")
 def test_add_product_to_cart():
     with allure.step("Добавление продукта в корзину"):
@@ -32,6 +34,7 @@ def test_add_product_to_cart():
         assert len(response_json["products"]) > 0
 
 
+@pytest.mark.api
 @allure.step("Тест на проверку наличия товара в корзине")
 def test_check_cart_items():
     with allure.step("Проверка содержимого корзины"):
@@ -43,6 +46,7 @@ def test_check_cart_items():
         assert len(response_json["products"]) > 0
 
 
+@pytest.mark.api
 @allure.step("Тест на удаление продукта из корзины и проверку, что корзина пуста")
 def test_remove_product_from_cart():
     with allure.step("Удаление продукта из корзины"):
@@ -58,6 +62,7 @@ def test_remove_product_from_cart():
         assert len(cart_response_json["products"]) == 0
 
 
+@pytest.mark.api
 @allure.step("Негативный тест: Проверка корзины без авторизации")
 def test_check_cart_without_auth():
     with allure.step("Проверка содержимого корзины без авторизации"):
